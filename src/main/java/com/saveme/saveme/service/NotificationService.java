@@ -7,7 +7,9 @@ import com.saveme.saveme.model.*;
 import com.saveme.saveme.repository.AcknowledgementRepository;
 import com.saveme.saveme.repository.NotificationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,10 +19,12 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final AcknowledgementRepository acknowledgementRepository;
+    private final FileStorageService fileStorageService;
 
-    public NotificationService(NotificationRepository notificationRepository, AcknowledgementRepository acknowledgementRepository) {
+    public NotificationService(NotificationRepository notificationRepository, AcknowledgementRepository acknowledgementRepository, FileStorageService fileStorageService) {
         this.notificationRepository = notificationRepository;
         this.acknowledgementRepository = acknowledgementRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public Notification createNotification(NotificationDto notificationDto) {
@@ -40,15 +44,6 @@ public class NotificationService {
         notification.setAffectedAdults(notificationDto.getAffectedAdults());
         notification.setComments(notificationDto.getComments());
         notification.setWaterLevel(notificationDto.getWaterLevel());
-
-        if (notificationDto.getPhotos() != null) {
-            notification.setPhotos(notificationDto.getPhotos().stream().map(url -> {
-                Photo photo = new Photo();
-                photo.setUrl(url);
-                photo.setNotification(notification);
-                return photo;
-            }).collect(Collectors.toList()));
-        }
 
         return notificationRepository.save(notification);
     }
@@ -76,6 +71,18 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         return acknowledgementRepository.save(acknowledgement);
+    }
+
+    public String storePhoto(Long notificationId, MultipartFile file) throws IOException {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new RuntimeException("Notification not found"));
+        String filename = fileStorageService.save(file);
+        Photo photo = new Photo();
+        photo.setUrl("/uploads/" + filename);
+        photo.setNotification(notification);
+        notification.getPhotos().add(photo);
+        notificationRepository.save(notification);
+        return photo.getUrl();
     }
 
     public SummaryDto getSummary() {

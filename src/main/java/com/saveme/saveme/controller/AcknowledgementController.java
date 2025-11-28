@@ -1,31 +1,28 @@
 package com.saveme.saveme.controller;
 
+import com.saveme.saveme.dto.AcknowledgementDto;
 import com.saveme.saveme.model.Acknowledgement;
-import com.saveme.saveme.service.AcknowledgementService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.saveme.saveme.service.NotificationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/acknowledgements")
+@RequiredArgsConstructor
+@Tag(name = "Acknowledgements", description = "API for acknowledging notifications")
 public class AcknowledgementController {
 
-    @Autowired
-    private AcknowledgementService acknowledgementService;
+    private final NotificationService notificationService;
 
     @PostMapping
-    public Acknowledgement createAcknowledgement(@RequestBody Acknowledgement acknowledgement) {
-        return acknowledgementService.createAcknowledgement(acknowledgement);
-    }
-
-    @GetMapping
-    public List<Acknowledgement> getAllAcknowledgements() {
-        return acknowledgementService.getAllAcknowledgements();
-    }
-
-    @GetMapping("/{id}")
-    public Acknowledgement getAcknowledgementById(@PathVariable Long id) {
-        return acknowledgementService.getAcknowledgementById(id);
+    @Operation(summary = "Acknowledge a notification")
+    public ResponseEntity<Acknowledgement> acknowledgeNotification(@RequestBody AcknowledgementDto acknowledgementDto) {
+        return ResponseEntity.ok(notificationService.acknowledgeNotification(acknowledgementDto));
     }
 }

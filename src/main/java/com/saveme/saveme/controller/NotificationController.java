@@ -1,6 +1,5 @@
 package com.saveme.saveme.controller;
 
-import com.saveme.saveme.dto.AcknowledgementDto;
 import com.saveme.saveme.dto.NotificationDto;
 import com.saveme.saveme.dto.SummaryDto;
 import com.saveme.saveme.model.Notification;
@@ -10,7 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -33,10 +34,11 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getAllNotifications());
     }
 
-    @PostMapping("/acknowledge")
-    @Operation(summary = "Acknowledge a notification")
-    public ResponseEntity<?> acknowledgeNotification(@RequestBody AcknowledgementDto acknowledgementDto) {
-        return ResponseEntity.ok(notificationService.acknowledgeNotification(acknowledgementDto));
+    @PostMapping("/{id}/photos")
+    @Operation(summary = "Upload a photo for a notification")
+    public ResponseEntity<String> uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        String photoUrl = notificationService.storePhoto(id, file);
+        return ResponseEntity.ok(photoUrl);
     }
 
     @GetMapping("/summary")
