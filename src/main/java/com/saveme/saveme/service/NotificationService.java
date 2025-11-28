@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class NotificationService {
         this.fileStorageService = fileStorageService;
     }
 
-    public Notification createNotification(NotificationDto notificationDto) {
+    public Notification createNotification(NotificationDto notificationDto, List<MultipartFile> photos) throws IOException {
         Notification notification = new Notification();
 
         Location location = new Location();
@@ -44,6 +45,18 @@ public class NotificationService {
         notification.setAffectedAdults(notificationDto.getAffectedAdults());
         notification.setComments(notificationDto.getComments());
         notification.setWaterLevel(notificationDto.getWaterLevel());
+
+        if (photos != null && !photos.isEmpty()) {
+            List<Photo> photoList = new ArrayList<>();
+            for (MultipartFile photoFile : photos) {
+                String filename = fileStorageService.save(photoFile);
+                Photo photo = new Photo();
+                photo.setUrl("/uploads/" + filename);
+                photo.setNotification(notification);
+                photoList.add(photo);
+            }
+            notification.setPhotos(photoList);
+        }
 
         return notificationRepository.save(notification);
     }
@@ -71,18 +84,6 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         return acknowledgementRepository.save(acknowledgement);
-    }
-
-    public String storePhoto(Long notificationId, MultipartFile file) throws IOException {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new RuntimeException("Notification not found"));
-        String filename = fileStorageService.save(file);
-        Photo photo = new Photo();
-        photo.setUrl("/uploads/" + filename);
-        photo.setNotification(notification);
-        notification.getPhotos().add(photo);
-        notificationRepository.save(notification);
-        return photo.getUrl();
     }
 
     public SummaryDto getSummary() {

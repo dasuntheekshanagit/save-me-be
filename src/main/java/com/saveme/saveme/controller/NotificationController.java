@@ -6,7 +6,7 @@ import com.saveme.saveme.model.Notification;
 import com.saveme.saveme.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,29 +16,26 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notifications")
-@RequiredArgsConstructor
 @Tag(name = "Notifications", description = "API for managing notifications")
 public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @PostMapping
-    @Operation(summary = "Create a new notification")
-    public ResponseEntity<Notification> createNotification(@RequestBody NotificationDto notificationDto) {
-        return ResponseEntity.ok(notificationService.createNotification(notificationDto));
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Create a new notification with optional photos")
+    public ResponseEntity<Notification> createNotification(@RequestPart("notification") NotificationDto notificationDto,
+                                                           @RequestPart(value = "photos", required = false) List<MultipartFile> photos) throws IOException {
+        return ResponseEntity.ok(notificationService.createNotification(notificationDto, photos));
     }
 
     @GetMapping
     @Operation(summary = "Get all notifications")
     public ResponseEntity<List<Notification>> getAllNotifications() {
         return ResponseEntity.ok(notificationService.getAllNotifications());
-    }
-
-    @PostMapping("/{id}/photos")
-    @Operation(summary = "Upload a photo for a notification")
-    public ResponseEntity<String> uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        String photoUrl = notificationService.storePhoto(id, file);
-        return ResponseEntity.ok(photoUrl);
     }
 
     @GetMapping("/summary")

@@ -10,7 +10,6 @@ public class NotificationDto {
     private String severity;
     private boolean isRoadBlocked;
     private String location;
-    private List<String> photos;
     private int affectedPeople;
     private int affectedChildren;
     private int affectedYoung;
@@ -73,14 +72,6 @@ public class NotificationDto {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public List<String> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<String> photos) {
-        this.photos = photos;
     }
 
     public int getAffectedPeople() {
