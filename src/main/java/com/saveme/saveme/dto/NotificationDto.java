@@ -12,7 +12,7 @@ public class NotificationDto {
     private String location;
     private int affectedPeople;
     private int affectedChildren;
-    private int affectedYoung;
+    private int affectedInjured;
     private int affectedAdults;
     private String comments;
     private Double waterLevel;
@@ -90,12 +90,12 @@ public class NotificationDto {
         this.affectedChildren = affectedChildren;
     }
 
-    public int getAffectedYoung() {
-        return affectedYoung;
+    public int getAffectedInjured() {
+        return affectedInjured;
     }
 
-    public void setAffectedYoung(int affectedYoung) {
-        this.affectedYoung = affectedYoung;
+    public void setAffectedInjured(int affectedInjured) {
+        this.affectedInjured = affectedInjured;
     }
 
     public int getAffectedAdults() {

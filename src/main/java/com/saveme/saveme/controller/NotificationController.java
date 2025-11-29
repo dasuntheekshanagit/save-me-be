@@ -1,5 +1,6 @@
 package com.saveme.saveme.controller;
 
+import com.saveme.saveme.dto.AcknowledgeRequestDto;
 import com.saveme.saveme.dto.NotificationDto;
 import com.saveme.saveme.dto.SummaryDto;
 import com.saveme.saveme.model.Notification;
@@ -31,56 +32,45 @@ public class NotificationController {
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "Create a new notification",
-            description = "Creates a new incident notification. This endpoint accepts multipart/form-data, allowing you to send both the notification details (as a JSON object) and multiple photo files in a single request.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Notification created successfully",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Notification.class)))
-            })
+    @Operation(summary = "Create a new notification")
     public ResponseEntity<Notification> createNotification(
-            @RequestPart("notification") @Schema(example =
-                    "{\n" +
-                    "  \"reporterName\": \"John Doe\",\n" +
-                    "  \"telephoneNumbers\": [\"+15551234567\", \"+15557654321\"],\n" +
-                    "  \"latitude\": 6.9271,\n" +
-                    "  \"longitude\": 79.8612,\n" +
-                    "  \"severity\": \"CRITICAL\",\n" +
-                    "  \"isRoadBlocked\": true,\n" +
-                    "  \"location\": \"Galle Road, Colombo\",\n" +
-                    "  \"affectedPeople\": 10,\n" +
-                    "  \"affectedChildren\": 2,\n" +
-                    "  \"affectedYoung\": 3,\n" +
-                    "  \"affectedAdults\": 5,\n" +
-                    "  \"comments\": \"Heavy flooding, water is rising quickly.\",\n" +
-                    "  \"waterLevel\": 2.5,\n" +
-                    "  \"type\": \"flood\"\n" +
-                    "}") NotificationDto notificationDto,
+            @RequestPart("notification") NotificationDto notificationDto,
             @RequestPart(value = "photos", required = false) List<MultipartFile> photos) throws IOException {
         return ResponseEntity.ok(notificationService.createNotification(notificationDto, photos));
     }
 
     @GetMapping
-    @Operation(summary = "Get all notifications",
-            description = "Retrieves a list of all submitted incident notifications.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved notifications",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Notification.class)))
-            })
+    @Operation(summary = "Get all notifications")
     public ResponseEntity<List<Notification>> getAllNotifications() {
         return ResponseEntity.ok(notificationService.getAllNotifications());
     }
 
+    @PostMapping("/{id}/vote-true")
+    @Operation(summary = "Vote a notification as true")
+    public ResponseEntity<Notification> voteTrue(@PathVariable Long id) {
+        return ResponseEntity.ok(notificationService.voteTrue(id));
+    }
+
+    @PostMapping("/{id}/vote-spam")
+    @Operation(summary = "Vote a notification as spam")
+    public ResponseEntity<Notification> voteSpam(@PathVariable Long id) {
+        return ResponseEntity.ok(notificationService.voteSpam(id));
+    }
+
+    @PostMapping("/{id}/acknowledge")
+    @Operation(summary = "Acknowledge a notification with a phone number")
+    public ResponseEntity<Notification> acknowledge(@PathVariable Long id, @RequestBody AcknowledgeRequestDto payload) {
+        return ResponseEntity.ok(notificationService.acknowledge(id, payload.getPhoneNumber()));
+    }
+
+    @PostMapping("/{id}/close")
+    @Operation(summary = "Close a notification")
+    public ResponseEntity<Notification> closeNotification(@PathVariable Long id) {
+        return ResponseEntity.ok(notificationService.closeNotification(id));
+    }
+
     @GetMapping("/summary")
-    @Operation(summary = "Get a summary of notifications",
-            description = "Provides a quick summary of notification statistics.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved summary",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = SummaryDto.class),
-                                    examples = @ExampleObject(value = "{\"tapped\": 15, \"missing\": 5, \"criticalAlerts\": 3}")))
-            })
+    @Operation(summary = "Get a summary of notifications")
     public ResponseEntity<SummaryDto> getSummary() {
         return ResponseEntity.ok(notificationService.getSummary());
     }

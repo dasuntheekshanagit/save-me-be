@@ -7,12 +7,15 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    @Query("SELECT COUNT(n) FROM Notification n WHERE n.trueReports > 0")
-    long countVerified();
-
-    @Query("SELECT COUNT(n) FROM Notification n WHERE n.trueReports = 0 AND n.spamReports = 0")
-    long countUnverified();
-
-    @Query("SELECT COUNT(n) FROM Notification n WHERE n.severity = 'CRITICAL'")
+    @Query("SELECT COUNT(n) FROM Notification n WHERE n.severity = 'CRITICAL' AND n.isOpen = true")
     long countCriticalAlerts();
+
+    @Query("SELECT COUNT(n) FROM Notification n WHERE n.isOpen = true")
+    long countOpenAlerts();
+
+    @Query("SELECT COUNT(n) FROM Notification n WHERE n.isOpen = false")
+    long countClosedAlerts();
+
+    @Query("SELECT COALESCE(SUM(n.affectedPeople), 0) FROM Notification n WHERE n.isOpen = false")
+    long countSavedPeople();
 }

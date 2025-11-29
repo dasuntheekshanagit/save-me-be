@@ -1,25 +1,10 @@
 package com.saveme.saveme.dto;
 
 public class SummaryDto {
-    private long tapped;
-    private long missing;
     private long criticalAlerts;
-
-    public long getTapped() {
-        return tapped;
-    }
-
-    public void setTapped(long tapped) {
-        this.tapped = tapped;
-    }
-
-    public long getMissing() {
-        return missing;
-    }
-
-    public void setMissing(long missing) {
-        this.missing = missing;
-    }
+    private long openAlerts;
+    private long closedAlerts;
+    private long savedPeople;
 
     public long getCriticalAlerts() {
         return criticalAlerts;
@@ -27,5 +12,29 @@ public class SummaryDto {
 
     public void setCriticalAlerts(long criticalAlerts) {
         this.criticalAlerts = criticalAlerts;
+    }
+
+    public long getOpenAlerts() {
+        return openAlerts;
+    }
+
+    public void setOpenAlerts(long openAlerts) {
+        this.openAlerts = openAlerts;
+    }
+
+    public long getClosedAlerts() {
+        return closedAlerts;
+    }
+
+    public void setClosedAlerts(long closedAlerts) {
+        this.closedAlerts = closedAlerts;
+    }
+
+    public long getSavedPeople() {
+        return savedPeople;
+    }
+
+    public void setSavedPeople(long savedPeople) {
+        this.savedPeople = savedPeople;
     }
 }

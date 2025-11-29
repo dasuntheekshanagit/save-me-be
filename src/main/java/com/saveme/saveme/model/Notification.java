@@ -1,13 +1,7 @@
 package com.saveme.saveme.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,27 +12,41 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private User reporter;
+    private String reporterName;
+    
+    @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Contact> reporterContacts;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Location location;
 
-    private String incidentType; // "flood", "landslide", "other"
+    private String locationDescription;
+
+    private String incidentType; // "flood", "landslide", "traped", "other"
     private String severity;
     private boolean roadBlocked;
+    private boolean isOpen = true;
     private LocalDateTime incidentTime;
 
     @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Photo> photos;
+
+    @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Acknowledgement> acknowledgements;
 
     private int affectedPeople;
     private int affectedChildren;
     private int affectedAdults;
+    private int affectedInjured;
     private String comments;
-    private double waterLevel; // for floods
+    private Double waterLevel; // for floods
     private int trueReports;
     private int spamReports;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -48,12 +56,20 @@ public class Notification {
         this.id = id;
     }
 
-    public User getReporter() {
-        return reporter;
+    public String getReporterName() {
+        return reporterName;
     }
 
-    public void setReporter(User reporter) {
-        this.reporter = reporter;
+    public void setReporterName(String reporterName) {
+        this.reporterName = reporterName;
+    }
+
+    public List<Contact> getReporterContacts() {
+        return reporterContacts;
+    }
+
+    public void setReporterContacts(List<Contact> reporterContacts) {
+        this.reporterContacts = reporterContacts;
     }
 
     public Location getLocation() {
@@ -62,6 +78,14 @@ public class Notification {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public String getLocationDescription() {
+        return locationDescription;
+    }
+
+    public void setLocationDescription(String locationDescription) {
+        this.locationDescription = locationDescription;
     }
 
     public String getIncidentType() {
@@ -88,6 +112,14 @@ public class Notification {
         this.roadBlocked = roadBlocked;
     }
 
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
+
     public LocalDateTime getIncidentTime() {
         return incidentTime;
     }
@@ -102,6 +134,14 @@ public class Notification {
 
     public void setPhotos(List<Photo> photos) {
         this.photos = photos;
+    }
+
+    public List<Acknowledgement> getAcknowledgements() {
+        return acknowledgements;
+    }
+
+    public void setAcknowledgements(List<Acknowledgement> acknowledgements) {
+        this.acknowledgements = acknowledgements;
     }
 
     public int getAffectedPeople() {
@@ -128,6 +168,14 @@ public class Notification {
         this.affectedAdults = affectedAdults;
     }
 
+    public int getAffectedInjured() {
+        return affectedInjured;
+    }
+
+    public void setAffectedInjured(int affectedInjured) {
+        this.affectedInjured = affectedInjured;
+    }
+
     public String getComments() {
         return comments;
     }
@@ -136,11 +184,11 @@ public class Notification {
         this.comments = comments;
     }
 
-    public double getWaterLevel() {
+    public Double getWaterLevel() {
         return waterLevel;
     }
 
-    public void setWaterLevel(double waterLevel) {
+    public void setWaterLevel(Double waterLevel) {
         this.waterLevel = waterLevel;
     }
 

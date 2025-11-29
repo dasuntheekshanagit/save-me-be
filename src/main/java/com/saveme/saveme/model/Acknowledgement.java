@@ -1,5 +1,6 @@
 package com.saveme.saveme.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,11 +10,11 @@ public class Acknowledgement {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "notification_id")
+    @JsonBackReference
     private Notification notification;
 
     private String phoneNumber;
-    private boolean isTrue;
-    private boolean isSpam;
 
     public Long getId() {
         return id;
@@ -37,21 +38,5 @@ public class Acknowledgement {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public boolean isTrue() {
-        return isTrue;
-    }
-
-    public void setTrue(boolean aTrue) {
-        isTrue = aTrue;
-    }
-
-    public boolean isSpam() {
-        return isSpam;
-    }
-
-    public void setSpam(boolean spam) {
-        isSpam = spam;
     }
 }
